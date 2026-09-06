@@ -169,3 +169,57 @@ honestly; it does not cost Elo (both 10-0), but V6 should re-check it over more 
    replays; (b) weed-repair-with-replay ledger; (c) fresh-tape evaluation with
    prefix-guard discipline; never combine untested changes again (the V4-draft -99k
    lesson).
+
+## 9. Production learnings (2026-09-07 — V5 validation + first public games)
+
+Ratings at analysis time: V4 `56054972` = 2226.7, V5 `56057787` = 2191.7, baseline
+`56054780` = 1532.6 (retired). Both team bots above the ~2030 bronze line. V5 plays
+~1 public game per 4 minutes as the newest bot. Sample is small (1 validation + 3
+public replays); ratings need ~2 days / 50+ games to stabilize — the notes below are
+evidence, not verdicts.
+
+### 9.1 Validation replay (episode 106154800, self-play, seed 0, engine 1.32.7)
+
+- Logs (`sub/presub-v5/logs/agent0.json`, `agent1.json`): empty stdout, no stderr,
+  per-turn durations ~0.05 ms after a 0.12 s turn-0 (BLOB decompression). Both DONE.
+- Shops had no YARN_STORE in all 8 unlocks → both seats correctly stayed MAIN all game.
+- Money identical through t360, then tiny divergence to a 644-coin gap on ~64k
+  (63629 vs 64273). Cause: weed-spawn RNG hits the two farms differently, so `weed_dig`
+  fires on different turns per seat. This is the repair working as designed, and it
+  bounds mirror self-play expectations: even identical code does not tie exactly.
+- Milk collapsed to $15-34 late (mirror milk dumping; shops were bakery/pet/farmers/
+  smoothie/ice-cream). Carrot spiked to 115-146 on 3 PET_CAFEs + farmers markets, but
+  was correctly untouched — carrot branch exists only under YARN and there was no yarn.
+- Final shed $0 rot both seats: `dead_stock` + terminal sweep fully liquidated.
+- Verdict: all V5 overlays healthy in production; nothing errored.
+
+### 9.2 First public games: 2W-1L — the wins matter more than the loss
+
+- WIN vs L7n (rank 513, 2226-class 2221.8), seed 478193935: 73069 vs 64884.
+- WIN vs Andrew Reed (rank 372, 2331.4), seed 1398065810: 100175 vs 95660.
+  Both victims rated above us — these wins drive V5's climb from default toward 2191.7.
+- LOSS vs mogura2.0 (rank 355, 2350.1), seed 1607074877: 68276 vs 68341 (−65 coins).
+  A sub-100-coin loss to a far stronger bot costs almost no Elo.
+
+### 9.3 Loss autopsy, episode 106183220 (−65 coins)
+
+- No yarn store all game → MAIN (correct). Carrot 43 at t360, unusable off-yarn —
+  single data point, no redesign justified.
+- Wool $1-37 all late game (no yarn demand + glut); milk 38-72.
+- Money identical through t504; the entire gap opened t504-576 (−50) and held flat to
+  t719 (−65). The loss was decided on days 21-24 — the exact zone where the removed
+  MILK_GLUT branch used to diverge (t577). Staying MAIN remains correct on average per
+  the V4 ablations, but top-350 meta beats our continuation specifically there.
+- Terminal already perfect ($0 rot both sides): nothing left to squeeze. This loss class
+  is unfixable via liquidation — only via a better day 21-24 continuation.
+- Confirmed V6 frontier (in order): (a) day 21-24 continuation vs top-400 meta, tested
+  strict-future vs recorded top-200 replays; (b) leave terminal and SELL ordering alone
+  — both validated perfect/healthy in production.
+
+### 9.4 What to watch while ratings converge
+
+- Winrate vs 1900-2300 peers and close-loss share (v27's authors tracked exactly this:
+  all 3 of their losses were close, <4k — ours match that pattern so far).
+- Any loss with nonzero final-shed rot on our side → re-open terminal investigation.
+- Any cluster of losses on YARN-branch games (n=1 so far: the old Ray Roberts V4 game)
+  → re-open the t=226 yarn decision, but only with multi-game evidence.
