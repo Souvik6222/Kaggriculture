@@ -1,0 +1,159 @@
+# Kaggriculture – Kaggle Competition Context
+
+I am participating in the **Kaggriculture** competition on Kaggle.
+
+**Competition Link:**
+https://www.kaggle.com/competitions/kaggriculture
+
+## Competition Information
+
+* **Competition:** Kaggriculture
+* **Platform:** Kaggle
+* **Competition Type:** Simulation Competition
+* **Category:** AI Agents / Simulation
+* **Competition Host:** Kaggle
+* **Prize Pool:** $50,000
+* **Objective:** Create an agent that plays a farming simulation and maximizes its income.
+* **Evaluation:** Custom competition metric
+* **Competition Status:** Active
+
+The official Kaggle description defines the competition as:
+
+> "Create an agent to play in this farming simulation and compete with others to maximize your income."
+
+## Nature of the Competition
+
+Kaggriculture is different from a conventional Kaggle machine-learning competition.
+
+It is an **agent-based farming simulation**.
+
+The participant creates an agent that interacts with a simulated farming environment. The agent makes decisions during the simulation, and its performance is evaluated based on the income it generates.
+
+The competition therefore focuses on an agent's ability to operate within a simulated environment and make decisions that lead to better overall results.
+
+## Data / Environment Structure
+
+The competition is based around a **simulation environment**, rather than a conventional static dataset such as:
+
+```text
+CSV
+    ↓
+Features
+    ↓
+Target
+```
+
+Instead, the agent interacts with the farming simulation.
+
+Conceptually, the competition can be represented as:
+
+```text
+        Farming Simulation
+                │
+                ▼
+          Current State
+                │
+                ▼
+              Agent
+                │
+                ▼
+             Action
+                │
+                ▼
+        Simulation Update
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+   New State          Reward/Income
+        │
+        └───────► Agent
+```
+
+The exact available state information, actions, simulation rules, and submission interface are defined by the official Kaggle competition environment and documentation.
+
+## Simulation
+
+The environment represents a farming scenario in which the agent is responsible for making decisions within the simulation.
+
+The simulation can involve factors such as:
+
+* Farming resources
+* Crops
+* Land
+* Production
+* Economic decisions
+* Time
+* Environmental conditions
+* Income
+* Other simulation state variables
+
+The exact mechanics and available actions should be taken from the official Kaggle competition documentation rather than assumed.
+
+## Agent
+
+The main participant in the competition is an **AI agent**.
+
+The agent receives information from the simulation and takes actions.
+
+Conceptually:
+
+```text
+State → Agent → Action → Environment → New State
+```
+
+The agent's objective is to make decisions that ultimately maximize its income during the simulation.
+
+## Evaluation
+
+Kaggriculture uses a **custom evaluation metric**.
+
+The primary objective is to maximize the performance of the submitted agent according to the competition's scoring system.
+
+The leaderboard ranks participating agents based on their performance in the simulation.
+
+The evaluation therefore measures the outcome of the agent's behavior rather than conventional prediction accuracy.
+
+## Competition Data
+
+Unlike a standard supervised-learning competition, the central competition resource is the **simulation environment and its interaction interface**.
+
+There is not simply a fixed table where each row corresponds to:
+
+```text
+input features → target
+```
+
+Instead, the relevant information is generated and/or provided through the simulation and the agent-environment interaction.
+
+The competition should therefore be understood as an **interactive simulation task**.
+
+## Submission
+
+Participants submit their agent according to the competition's Kaggle submission requirements.
+
+The submitted agent is evaluated by running it within the competition environment.
+
+The resulting simulation performance contributes to the participant's leaderboard score.
+
+The official Kaggle documentation should be treated as the source of truth for the exact submission format, runtime restrictions, available APIs, and evaluation procedure.
+
+## Important Competition Characteristics
+
+This competition should be treated as:
+
+* An AI-agent competition
+* A farming simulation
+* An interactive environment
+* A decision-making problem
+* A custom-metric competition
+* A competition where the objective is maximizing income
+* A Kaggle competition with a $50,000 prize pool
+
+## Project Context
+
+All code, experiments, analysis, simulations, agent behavior, results, and discussions in this project should be considered within the context of the **Kaggriculture Kaggle competition**.
+
+The primary objective is to develop and evaluate an agent capable of performing effectively in the Kaggriculture farming simulation.
+
+**Official Competition Page:**
+https://www.kaggle.com/competitions/kaggriculture

@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Logs and temporary databases
+*.log
+
+# Scratch ablation variants
+my/agent_variant_*.py
+my/variant_*.py
+my/v_*.py
