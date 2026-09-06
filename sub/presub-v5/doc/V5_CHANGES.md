@@ -1,0 +1,171 @@
+# V5 Safe Overlays — Complete Change Log
+
+- Date: 2026-09-06
+- Team: Sōsuke Aizen (`soukeaizenz`, `souvikdbiswas`)
+- Base: V4 agent `my/main.py` (md5 `412de06253e3245be11a441f1b9ca4df`, identical to `my/v4_main.py`)
+- Result: `sub/presub-v5/main.py` + `sub/presub-v5/submission.tar.gz`
+- Submission: `56057787` — "V5 safe overlays (feed5, sparse SELL order, terminal $1)"
+- Status: submitted, PENDING validation at time of writing
+
+## 1. Ladder context (why V5 exists)
+
+- Public leaderboard (2026-09-06 snapshot, 7873 teams): bronze ≈ rank 787, score ≈ 2030
+  (781st 2033.7 / 788th 2029.1).
+- Team submissions that day:
+  - `56054780` — baseline test, 1389.5 → later 1524.0 (retired after V5 submit).
+  - `56054972` — friend's V4, 1889.2 → 1942.5 → **2075.7** (bronze line crossed while V5 was built).
+- Replay sample of V4 (6 latest episodes at analysis time): 5W-1L, including wins over
+  rank 538 (2197.8, Pilkwang Kim) and rank 819 (2010.8, 佐藤滉太). The single loss was a
+  YARN-branch game vs rank 985 (1941.7, Ray Roberts), 99860 vs 103897 — a 1-game sample,
+  not a verdict on the YARN branch.
+- V4's published ablations were validated **vs random only** (+12,208 coins, 12W-8L over
+  20 seeds). The Kaggle ladder is Elo head-to-head vs strong reactive bots where only
+  W/L/T matters, never coin margin. So V5 was required to (a) preserve everything V4
+  proved, (b) add only overlays that cannot reorder the tape's cash-flow sequence,
+  (c) prove itself head-to-head vs V4 and vs public field agents, not just vs random.
+
+## 2. Design constraints obeyed
+
+1. Tape replay architecture untouched — no RL, no online invention of the 720-turn plan.
+2. Route BLOB byte-identical (never edited; `diff` confirms only docstring/code hunks).
+3. `DECISIONS` unchanged: `(226, shop_YARN_STORE → YARN)`, `(360, px_CARROT ≥ 42 → YARN_CARROT)`,
+   no MILK switch (lines 97-100). The old t=433 milk switch stays removed: MAIN and
+   MILK_GLUT are byte-identical until t=577, so t=433 decides 144 turns early on stale data.
+4. V4 repairs preserved exactly: `weed_dig`, projected-shed DROP/PLACE accounting,
+   `clamp_sells`, `dead_stock` (surplus vs `future_sells`), hand-reconciliation safety
+   layer, top-level crash-to-PASS wrapper.
+5. Public-state-only inputs (shops, prices, inventory, own shed/hands). No seed, Futureshop,
+   opponent identity, or private opponent state.
+
+## 3. ALL changes (exhaustive — 4 hunks, nothing else)
+
+Source of ideas: `skomuro/2000-baseline-silver-medal-route` (2000+ silver, feed5/terminal/
+banking/liq_ramp overlays) and `kaitofukami/25-27-strict-future-v27-midgame-meta-reset`
+(sparse SELL-slot ordering, +819 margin, +1 outer win). Banking / split-debt / weed-replay /
+fresh-tape options were studied and **deferred** (Section 5).
+
+### Hunk 1 — Header docstring (lines 1-8, 18-44): truthful V5 description
+- "three points" → "two points" (the code has two decisions; the old text still said three).
+- Removed the stale t=433 milk line; documented why (144-turn pre-commitment flaw).
+- Documented the three V5 additions and their order-preservation guarantee.
+- Historical MEASURED panel (968-game, 74.5% HOLD) left as-is — it describes the V4
+  foundation, not V5.
+
+### Hunk 2 — Constant (line 89)
+```python
+TERMINAL_START = 714  # step 718 is the last executed action; 719 never runs
+```
+Single new constant. The 714-718 window comes from the silver baseline's terminal
+analysis (walk-in/DROP/sell-all; engine never executes step 719's action).
+
+### Hunk 3a — feed5 (lines 543-552, inside `act`, right after route market copy)
+```python
+# ---- feed5: keep the tape's step-0 feed purchase in market slot 0 ----
+# Feed-denial defense. Stable move of one order; all other slots keep
+# their relative order, so the opening cash-flow sequence is unchanged.
+if step == 0:
+    for idx in range(1, len(market)):
+        o = market[idx]
+        if o and o[0] == "BUY_PRODUCT" and len(o) > 1 and o[1] == "WHEAT":
+            market.insert(0, market.pop(idx))
+            break
+```
+- Effect on our tape: currently a **no-op** (step-0 market is a single
+  `BUY_PRODUCT WHEAT 13` already in slot 0). Pure defense: if any future tape has the
+  feed buy elsewhere, it is stably promoted without disturbing anything else.
+- Safety: one stable pop/insert at index 0; relative order of all other orders kept.
+
+### Hunk 3b — sparse SELL ordering (lines 608-619, after `clamp_sells`, before `dead_stock`)
+```python
+# ---- sell_order (sparse): permute SELLs only among SELL slots ----
+# Non-SELL slots never move, so no SELL jumps ahead of a BUY/HIRE and
+# the tape's cash-flow order is preserved. Only SELL-vs-SELL priority
+# changes, richest (price*qty) first, so a premium sale is never cut
+# off by the 10-order cap behind a low-value one.
+if step > 0:
+    sells = [o for o in market if o and o[0] == "SELL"]
+    if len(sells) > 1:
+        sells.sort(key=lambda o: -(prices.get(o[1], 0) * int(o[2])))
+        it = iter(sells)
+        market = [next(it) if (o and o[0] == "SELL") else o for o in market]
+```
+- Why this instead of full "sells first": full sells-before-buys reordering lost 17 HOLD
+  games (Turn-2 SELL funds the opening BUY/HIRE chain; moving it last bankrupts the
+  opening). Here BUY/HIRE/LAND slots are positionally frozen — only SELL-vs-SELL order
+  changes — so the Turn-2 failure mode is structurally impossible.
+- Sort key is live `price * qty` (same value metric `dead_stock` already uses for extras).
+
+### Hunk 3c — terminal $1 sweep (lines 631-635, inside `dead_stock`)
+```python
+# Terminal sweep: 718 is the last executed action, so on 714-718
+# sell at any price >= 1 instead of letting $1 goods rot. Extra
+# orders only fill spare slots after route sells, never evicting.
+min_price = 1 if step >= TERMINAL_START else 2
+if surplus > 0 and prices.get(it, 0) >= min_price:
+```
+- Old behavior: `price > 1`, i.e. $1-floor goods (collapsed MELON/MILK/WOOL/STRAWBERRY)
+  were left to rot even on the final turns.
+- New: identical except steps 714-718 accept price ≥ 1. Because extras are appended
+  after route sells and truncated to `MAX_ORDERS = 10`, route sells can never be evicted
+  (the failure of the rejected unprioritized fertilizer-718 sweep, -2,517 pts).
+
+## 4. Explicitly NOT changed
+
+- Route `_BLOB` (all 4 tails), `routes()`, `_shed_adjacent`, `_feature`, `_noop`,
+  `Agent.future_sells`, `_switch_ok`, `weed_dig`, projected-shed accounting,
+  `clamp_sells`, `dead_stock` surplus math and extra sorting, safety layer, `agent()`.
+- `diff my/main.py sub/presub-v5/main.py` shows only the hunks above.
+
+## 5. Considered and deferred (with reason)
+
+- Fresh 1-COW/4-SHEEP meta tapes (v27/Ezzzzzekki, Fieldbook 8-route bank): Top-30 opening
+  audit says our 2-COW/2-SHEEP HIRE5 opening is off-meta, but V4 beats v27 and silver
+  10-0 head-to-head locally, so a tape swap is not justified without strict-future
+  validation vs recorded top opponents. Left for V6.
+- Full-banking (divert PASS/movement carriers to DROP when holding ≥ $2000 premium):
+  replaces movement with DROP, desyncing future tape positions without a replay ledger.
+  Too risky for V5.
+- Split pull-forward with debt ledger, town-adaptive COW→SHEEP conversion, wool-gate
+  staged release, mirror frontrun: same verdict — real upside but needs dedicated
+  ablation vs strong opponents first.
+- Idle WATER/HARVEST rescues and unprioritized fertilizer sweep: already rejected by
+  friend's ablations (-8.3k / -9.1k / -2.5k vs baseline). Not revived.
+
+## 6. Validation (kaggle-environments 1.32.7, `my/eval_suite.py`)
+
+| Test | Result |
+|---|---|
+| `py_compile` | OK |
+| Smoke, seed 42 vs random | V5 138,570 vs 0, 1.9 s, no error |
+| vs random, 10 seeds 42-51 | V5 144,671 mean, 10W-0L (V4 same seeds: 153,335 — V5 trails ~8.6k absolute; W/L identical, and ladder scores W/L only) |
+| H2H V5 vs V4, 20 games alternating seats | **V5 15W-5L**, mean 88,091 vs 87,851 (+240) |
+| H2H V5 vs silver-2000+ agent, 10 | **V5 10W-0L**, 106,854 vs 86,152 |
+| H2H V5 vs v27 agent, 10 | **V5 10W-0L**, 108,747 vs 71,008 |
+| Crash/error count | 0 across ~50 games (~36k turns) |
+
+Reading: V5 keeps V4's field dominance and adds a mirror edge (sparse ordering pays when
+both players contest the same premium curves). The vs-random absolute deficit is noted
+honestly; it does not cost Elo (both 10-0), but V6 should re-check it over more seeds.
+
+## 7. Submission record
+
+- Artifact: `sub/presub-v5/submission.tar.gz` (30,298 bytes, contains `main.py` at root).
+- Command:
+  `kaggle competitions submit kaggriculture -f sub/presub-v5/submission.tar.gz -m "V5 safe overlays (feed5, sparse SELL order, terminal $1)"`
+- Returned submission `56057787`, PENDING (self-play validation) at submit time.
+- Day quota after submit: 2 remaining. Active pair is now {V4 `56054972`, V5 `56057787`};
+  baseline test `56054780` auto-retired (latest-2 rule) as intended.
+- Monitor: `kaggle competitions episodes 56057787 -v`, logs via
+  `kaggle competitions logs <EPISODE_ID> <agent_index>`, leaderboard via
+  `kaggle competitions leaderboard -c kaggriculture --show`.
+
+## 8. Risks and next steps for V6
+
+1. New-bot warm-up: V5 starts near default rating and must climb; V4 (2075.7) covers the
+   team score meanwhile. Judge V5 on winrate vs 1900-2100 peers, not first-day rating.
+2. If V5 underperforms peers over ~20 episodes, prime suspect is sparse SELL ordering
+   (revert Hunk 3b first — it is the only hunk that changes mid-game market order).
+3. V6 candidates in order: (a) strict-future ablation of Hunk 3b on recorded top-200
+   replays; (b) weed-repair-with-replay ledger; (c) fresh-tape evaluation with
+   prefix-guard discipline; never combine untested changes again (the V4-draft -99k
+   lesson).
