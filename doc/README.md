@@ -14,6 +14,7 @@ An in-depth technical monograph and engineering logbook documenting the research
 | **Chapter 4** | [04. Proposed Upgrades & Initial Hypotheses](04_THE_V4_UPGRADE_HYPOTHESES_AND_DESIGNS.md) | Theoretical formulation of 7 proposed enhancements: Route Bank metadata, water rescue, harvest rescue, market order sorting, early dead-stock detection, opponent awareness, and action safety. |
 | **Chapter 5** | [05. Experimental Logbook & Forensic Ablations](05_EXPERIMENTAL_LOGBOOK_AND_ABLATION_ANALYSIS.md) | The heart of the engineering journey: diagnosing why initial V4 collapsed (-100k points), uncovering cash-flow inversion and premature harvest yield loss, and proving the 144-turn divergence flaw in the baseline's milk-glut branch. |
 | **Chapter 6** | [06. Final Architecture & Code Walkthrough](06_FINAL_V4_AGENT_CODE_AND_MATHEMATICAL_VERIFICATION.md) | Line-by-line walkthrough of the production `main.py`, verification of the action safety layer, runtime benchmark statistics (252 turns/sec), and leaderboard projections. |
+| **Chapter 7** | [07. Herds & Openings — Beginner's Field Guide](07_HERD_AND_OPENING_FIELD_GUIDE_FOR_BEGINNERS.md) | Beginner-friendly guide to openings (2C/2S vs 1C/4S), herd types, shop synergies, and replay evidence — start here if the other chapters assume too much. |
 
 ---
 

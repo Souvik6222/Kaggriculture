@@ -170,6 +170,13 @@ honestly; it does not cost Elo (both 10-0), but V6 should re-check it over more 
    prefix-guard discipline; never combine untested changes again (the V4-draft -99k
    lesson).
 
+Update 2026-09-07 (Chiranjieev game, episode 106349904, V4 WIN +5058 vs rank ~454):
+geese evidence is now 2-0 vs pasture-only herds (Calmracer +3397, Chiranjieev +5058)
+— keep the coops is the default. Gap opened t432-504 (days 18-21), so the mid-game
+frontier refines from "days 21-24" to "days 18-24". Terminal $0 rot both sides again.
+Pre-V6 recon priority stays: diverse-mix opponents (len8487-type), full-game scope,
+mirrors excluded.
+
 ## 9. Production learnings (2026-09-07 — V5 validation + first public games)
 
 Ratings at analysis time: V4 `56054972` = 2226.7, V5 `56057787` = 2191.7, baseline
@@ -223,3 +230,45 @@ evidence, not verdicts.
 - Any loss with nonzero final-shed rot on our side → re-open terminal investigation.
 - Any cluster of losses on YARN-branch games (n=1 so far: the old Ray Roberts V4 game)
   → re-open the t=226 yarn decision, but only with multi-game evidence.
+
+## 10. Bucketed W/L vs opponent strength (20-replay sample, 2026-09-07)
+
+Source: `sub/replay-buckets/` — 10 V5 + 10 V4 public replays, spread oldest→newest per
+bot (one file was the friend's solo-account game and was excluded → 19 usable).
+Opponent strength = current-leaderboard rating as proxy (not at-game-time rating, so
+treat bucket edges as approximate). Replays are NOT committed (607MB).
+
+| Bot | Episode | Res | Us | Opp | ± | Opponent | OppRank | OppScore |
+|---|---|---|---|---|---|---|---|---|
+| V4 | 106137593 | WIN | 85185 | 72818 | +12367 | Kosakunin | 1280 | 1732.9 |
+| V4 | 106149809 | LOSS | 90018 | 111579 | −21561 | Sergey Kutepov | 597 | 2199.3 |
+| V5 | 106154995 | WIN | 174918 | 56130 | +118788 | Manuel Pérez | 4909 | 599.1 |
+| V4 | 106160708 | WIN | 77799 | 76941 | +858 | Michael Silverblatt | 717 | 2115.2 |
+| V5 | 106165740 | WIN | 89883 | 81150 | +8733 | Arthurs Torres24 | 1149 | 1840.2 |
+| V4 | 106172603 | TIE | 67925 | 67925 | +0 | Max Podd | 362 | 2372.6 |
+| V5 | 106178677 | LOSS | 53273 | 60017 | −6744 | nvidia fan | 690 | 2129.4 |
+| V5 | 106188780 | WIN | 142780 | 131708 | +11072 | DeeperNet | 621 | 2185.8 |
+| V4 | 106196324 | WIN | 93945 | 82907 | +11038 | MMN0222 | 507 | 2273.2 |
+| V5 | 106199733 | LOSS | 96676 | 98823 | −2147 | ShiviWhivi | 361 | 2373.8 |
+| V5 | 106211902 | WIN | 73187 | 69790 | +3397 | Calmracer | 354 | 2381.3 |
+| V4 | 106233573 | WIN | 110118 | 103721 | +6397 | Sarthak Sharma | 759 | 2085.3 |
+| V5 | 106245124 | WIN | 149806 | 143221 | +6585 | Lunospital | 556 | 2230.8 |
+| V4 | 106264250 | WIN | 102773 | 101019 | +1754 | Wang H2O | 518 | 2264.2 |
+| V5 | 106272326 | WIN | 77796 | 76606 | +1190 | yuki0731 | 655 | 2162.2 |
+| V4 | 106297305 | WIN | 87190 | 87135 | +55 | koren sabag | 397 | 2349.4 |
+| V5 | 106299597 | LOSS | 75203 | 75483 | −280 | ShiviWhivi | 361 | 2373.8 |
+| V5 | 106329422 | LOSS | 58175 | 64618 | −6443 | len8487 | 364 | 2371.8 |
+| V4 | 106329608 | WIN | 63341 | 60093 | +3248 | Maksimov Evgeniy | 439 | 2323.8 |
+
+Tally (buckets: <2200 / 2200-2350 bubble / 2350+):
+
+| Scope | <2200 | 2200-2350 | 2350+ | ALL |
+|---|---|---|---|---|
+| V4 | 3W-1L | 4W-0L | 0W-0L-1T | 7W-1L-1T |
+| V5 | 4W-1L | 1W-0L | 1W-3L | 6W-4L |
+| BOTH | 7W-2L | 5W-0L | 1W-3L-1T | 13W-5L-1T |
+
+Reading: bubble undefeated (5-0) — the firewall holding our rank. 2350+ is the
+ceiling (1-3-1, all close except −6443). Both sub-2200 losses were early-climb games.
+In-sample V4 > V5, but samples cover different lifespan phases — ladder has them 6
+points apart, same tier. Caveats: n=19, proxy ratings, arbitrary bucket edges.

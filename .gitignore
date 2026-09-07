@@ -13,3 +13,9 @@ __pycache__/
 my/agent_variant_*.py
 my/variant_*.py
 my/v_*.py
+
+# Downloaded replay data (large binaries, reproducible via kaggle CLI)
+sub/replay-buckets/
+sub/replay-latest/
+sub/epi-ds/
+sub/presub-v5/logs/
