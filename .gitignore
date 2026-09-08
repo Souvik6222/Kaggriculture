@@ -17,5 +17,6 @@ my/v_*.py
 # Downloaded replay data (large binaries, reproducible via kaggle CLI)
 sub/replay-buckets/
 sub/replay-latest/
+sub/replay-v7loss/
 sub/epi-ds/
 sub/presub-v5/logs/

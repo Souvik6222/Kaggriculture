@@ -272,3 +272,50 @@ Reading: bubble undefeated (5-0) — the firewall holding our rank. 2350+ is the
 ceiling (1-3-1, all close except −6443). Both sub-2200 losses were early-climb games.
 In-sample V4 > V5, but samples cover different lifespan phases — ladder has them 6
 points apart, same tier. Caveats: n=19, proxy ratings, arbitrary bucket edges.
+
+## 11. V7 recent-form watch (2026-09-08 — Tandem: recon week decision record)
+
+Context: teammate shipped V7 (submission 56092598, 5-tape base + sparse ordering only;
+their doc: `sub/presub-v7/doc/V7_CHANGES.md`). Standings at write time: base 2370.8
+(sliding, −67), V7 2284.2 (+23, grinding), team rank 597, silver line 2498.8 (rank
+384) and rising ~60/day. Our V5 (2297.7) / V4 (2339.8) retired-frozen. Ladder rule
+reaffirmed: rank is the currency, score inflates — we gained points two days running
+while falling 375 → 597.
+
+### 11.1 Last-six sample: 1W-5L, all close (replays: `sub/replay-v7loss/`)
+
+| Episode | Res | Us-Opp | ± | Opponent | Decided |
+|---|---|---|---|---|---|
+| 106863959 | LOSS | 72966-75898 | −2932 | SA | mid-game bleed (gap by t432, grew) |
+| 106865021 | WIN | 93503-90116 | +3387 | Kenjo1209 | quality win — protect, don't "fix" |
+| 106870605 | LOSS | 134863-138827 | −3964 | xiao xiongwei | mid-game bleed (gap by t432) |
+| 106873278 | LOSS | 57449-59374 | −1925 | Lujia Liang | LATE collapse (−2k across days 24-30) |
+| 106874316 | LOSS | 96401-100390 | −3989 | Alan | LATE collapse (−4.3k across days 24-30; led +371 at t576) |
+| 106875795 | LOSS | 64809-68567 | −3758 | LIH.YUN | mid-game bleed (gap t432-576) |
+
+Two flavors: mid-game bleed (t288-576, known from V5 era) and late collapse (days
+24-30, NEW — our endgame block out-executed after parity at t576). Ruled out again:
+terminal rot ~$0 both sides in all five (crumbs vs 2-4k gaps); openings flat to t144
+in 3/5. No yarn store in 4/5 late games (wool $1, milk $1-187 by game).
+
+### 11.2 The −585 tripwire (open, probably nothing)
+
+Alan and LIH.YUN both trailed exactly −585 at t144, different opponents/shops/seeds.
+With 5 games × 8 checkpoints scanned, one exact repeat is expected by chance
+(look-elsewhere) — flagged, not claimed. Promotion rule: a third −585@144 sighting
+makes it a pattern; hunt = compare opponent t0-144 market actions across the three
+for the common element (likely early sell-order price impact), fix = early-turn sell
+ordering or opening timing.
+
+### 11.3 Decision record: recon week (no-submit posture)
+
+- Ladder: nothing to submit — no candidate with 20-0-style proof exists. Both live
+  bots bank games autonomously; 4 daily slots unspent by design.
+- Lab (our lane): scan on-disk replays for third −585; diff Alan/Lujia days 24-30 vs
+  V7's endgame block; output = target list to teammate, never code.
+- Base/harness (teammate's lane): endgame tweaks, Hunk-3b-vs-2350+ question, single-hunk
+  discipline; `sub/other-sub-v2/teammate-2487-submission.tar.gz` is the instant rollback.
+- Tripwires that authorize a V8 build: third −585; V7 close-loss share still bad over
+  next 20; either live bot flat under a rising line for a full day.
+- 20GB `sub/epi-ds/` gods-tier dump kept on disk, uncommitted, for 3000-level meta
+  study only if the 2350+ work stalls.
